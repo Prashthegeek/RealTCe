@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import MonacoEditor from '@monaco-editor/react'; // Import Monaco Editor
+import axios from 'axios';
 
 const socket = io('http://localhost:5000');
 
@@ -59,16 +60,15 @@ const Room = () => {
     // Function to execute code
     const handleExecuteCode = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/execute`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ code }),
-            });
-
-            const result = await response.json();
-            setOutput(result.output); // Update the output state with the result
+            const response = await axios.post(`http://localhost:5000/api/auth/execute`, { code })
+          
+            // console.log(response);
+             // Check if the output is a JSON string
+            if (typeof output === 'string' && output.startsWith('{')) {
+              setOutput(JSON.parse(output)); // Parse the output back to a JavaScript object and store it in the output
+            } else {
+              setOutput(output);
+            } 
         } catch (error) {
             console.error('Error executing code:', error);
         }
@@ -112,8 +112,10 @@ const Room = () => {
                 </Box>
 
                 <Box width="100%" bg="gray.100" p={4} borderRadius="md">
-                    <strong>Output:</strong>
-                    <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>{output}</pre>
+                    <strong>Output</strong>
+                    <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+                        {typeof output === 'object' ? JSON.stringify(output, null, 2) : output}
+                    </pre>
                 </Box>
             </VStack>
         </Box>

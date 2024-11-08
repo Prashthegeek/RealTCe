@@ -36,6 +36,7 @@ const Login = () => {
     try {
       const response = await axios.post(`${baseURL}/api/auth/login`, formData);
       // Store token and user data in local storage
+      // console.log(response)
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
 

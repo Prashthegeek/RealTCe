@@ -30,7 +30,8 @@ app.use(cors({
 app.use(express.json());
 
 // Authentication routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);//isska bhi path authRoutes.js me define kar diya(glti se)
+
 
 // In-memory store for room codes and users
 const roomCodeStore = {};
