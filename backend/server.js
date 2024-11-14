@@ -1,6 +1,7 @@
 const express = require('express');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
+const ExecuteRoutes = require('./routes/ExecuteRoutes');
 const cors = require('cors');
 const http = require('http'); 
 const { Server } = require('socket.io');
@@ -29,6 +30,9 @@ app.use(cors({
 // Middleware to parse JSON requests
 app.use(express.json());
 
+
+//execution routes 
+app.use('/api/execute', ExecuteRoutes);
 // Authentication routes
 app.use('/api/auth', authRoutes);//isska bhi path authRoutes.js me define kar diya(glti se)
 
@@ -38,7 +42,7 @@ const roomCodeStore = {};
 const roomUserStore = {}; // Object to keep track of users in each room
 
 // Handle Socket.IO connections
-io.on('connection', (socket) => {
+io.on('connection', (socket) => {  //whenever a socket connects to the server
     console.log('A user connected');
 
     let currentUser; // Store user info in a local variable

@@ -1,4 +1,4 @@
-import { Box, useToast, VStack, HStack, Button } from '@chakra-ui/react';
+import { Box, useToast, VStack, HStack, Button,  Select } from '@chakra-ui/react';
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
@@ -7,6 +7,14 @@ import axios from 'axios';
 
 const socket = io('http://localhost:5000');
 
+
+const languages = [  //array of objects
+    { label: 'Python', value: 'python' },
+    { label: 'JavaScript', value: 'javascript' },
+    { label: 'C++', value: 'cpp' },
+    { label: 'Java', value: 'java' },
+];
+
 const Room = () => {
     const { roomId } = useParams();
     const toast = useToast();
@@ -14,7 +22,9 @@ const Room = () => {
     const [code, setCode] = useState(''); // State for storing code
     const [users, setUsers] = useState([]); // State for tracking users in the room
     const [output, setOutput] = useState(''); // State for storing output
+    const [language, setLanguage] = useState(languages[1].value)  //by default with js
     const hasWelcomed = useRef(false); // Ref to track if the welcome toast has been shown
+    
 
     // Welcome message effect
     useEffect(() => {
@@ -57,22 +67,33 @@ const Room = () => {
         socket.emit('codeUpdate', { roomId, code: value });
     };
 
-    // Function to execute code
-    const handleExecuteCode = async () => {
-        try {
-            const response = await axios.post(`http://localhost:5000/api/auth/execute`, { code })
-          
-            // console.log(response);
-             // Check if the output is a JSON string
-            if (typeof output === 'string' && output.startsWith('{')) {
-              setOutput(JSON.parse(output)); // Parse the output back to a JavaScript object and store it in the output
-            } else {
-              setOutput(output);
-            } 
-        } catch (error) {
-            console.error('Error executing code:', error);
-        }
-    };
+    //func to handle execute
+
+// Function to execute code
+const handleExecuteCode = async () => {
+    try {
+        const response = await axios.post('http://localhost:5000/api/execute', { code, language });
+
+        // Check if response contains output or error and update accordingly
+        const output = response.data.output || response.data.error || 'No output generated';
+
+        // Update the output in the UI
+        setOutput(output);
+    } catch (error) {
+        // Handle any network or server errors
+        const errorMessage = error.response?.data?.error || 'Code execution failed';
+        
+        console.error('Error executing code:', errorMessage);
+        
+        // Update the output with the error message
+        setOutput(errorMessage);
+    }
+
+
+
+
+
+};
 
     return (
         <Box display="flex" height="100vh" padding={4}>
@@ -92,6 +113,22 @@ const Room = () => {
                     </ul>
                 </Box>
             </VStack>
+
+            {/*for language selection */}
+
+            <Select
+                placeholder="Select Language"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                mb={4}
+            >
+                {languages.map((lang) => (
+                    <option key={lang.value} value={lang.value}>
+                        {lang.label}
+                    </option>
+                ))}
+            </Select>
+
 
             <VStack flex="1" bg="white" p={4} spacing={4}>
                 <HStack justifyContent="space-between" width="full">
