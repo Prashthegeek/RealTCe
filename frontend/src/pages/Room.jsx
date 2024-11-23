@@ -168,7 +168,7 @@ import { io } from 'socket.io-client';
 import MonacoEditor from '@monaco-editor/react'; // Import Monaco Editor
 import axios from 'axios';
 
-
+const socket = io('http://localhost:5000');
 
 
 const languages = [  //array of objects
@@ -204,7 +204,6 @@ const Room = () => {
 
     // Room join and code handling effect (triggered only once on mount)
     useEffect(() => {
-        const socket = io('http://localhost:5000');
         socket.emit('joinRoom', { roomId, user });
 
         // const handleCodeUpdate = (currentCode) => {
