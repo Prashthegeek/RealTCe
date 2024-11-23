@@ -39,11 +39,15 @@ app.use('/api/auth', authRoutes);//isska bhi path authRoutes.js me define kar di
 
 // In-memory store for room codes and users
 const roomCodeStore = {};
+const roomLangStore = {} ;//store the current language of the room
+const roomOutputStore = {}; 
 const roomUserStore = {}; // Object to keep track of users in each room
 
+
+
 // Handle Socket.IO connections
-io.on('connection', (socket) => {  //whenever a socket connects to the server
-    console.log('A user connected');
+io.on('connection', (socket) => {  //listening to connection event (means user connected, now do the work)
+    console.log('A user connected with socket id : ' , socket.id);
 
     let currentUser; // Store user info in a local variable
 
@@ -55,34 +59,55 @@ io.on('connection', (socket) => {  //whenever a socket connects to the server
 
         // Initialize user store for the room if it doesn't exist
         if (!roomUserStore[roomId]) {
-            roomUserStore[roomId] = []; // Create an empty array for users
+            roomUserStore[roomId] = []; // Create an empty array for users(currently no user here)
         }
-
         // Check if the user is already in the room
         if (!roomUserStore[roomId].includes(user.name)) {
             roomUserStore[roomId].push(user.name); // Add the user to the room
 
             // Notify everyone in the room that a new user has joined
-            socket.to(roomId).emit('userJoined', `${user.name} has joined the room`);
+            socket.to(roomId).emit('userJoined', `${user.name} has joined the room`);  //can skip it 
         }
 
         // Send the current code to the user who just joined
         const currentCode = roomCodeStore[roomId] || ''; // Get the existing code or set to an empty string
-        socket.emit('codeUpdate', currentCode);
+        socket.emit('prevCode', currentCode);   //so, this event will be sent only when usersent and event for joinRoom
+
+        //send the current lang to the user who just joined
+        const currentLang = roomLangStore[roomId] || '';
+        socket.emit('prevLang' , currentLang) ; 
+
+        //send the current output box content to the user who just joined
+        const currentOutput = roomOutputStore[roomId] || '';
+        socket.emit('prevOutput' , currentOutput) ;
 
         // Broadcast the updated user list to everyone in the room
-        io.to(roomId).emit('userListUpdate', roomUserStore[roomId]);
+        io.to(roomId).emit('userListUpdate', roomUserStore[roomId]);  //sent the whole list of array to the frontend
     });
 
     // Listen for code updates from this user
-    socket.on('codeUpdate', ({ roomId, code }) => {
+    socket.on('codeUpdate', ({ roomId, code }) => {  
         // Update the code for the room in the store
         roomCodeStore[roomId] = code;
 
         // Broadcast the updated code to everyone else in the room
-        socket.to(roomId).emit('codeUpdate', code);
+        socket.to(roomId).emit('codeUpdate', code);  //emit to everyone else
     });
 
+    //listen to LangUpdate event ->
+    socket.on('langUpdate' , ({roomId, language}) =>{
+        //update the language for the room in the store.
+        roomLangStore[roomId] = language ;
+        //broadcase the updated lang to everyone else in the room. 
+        socket.to(roomId).emit('langUpdate' , language);  //can have different name than langUpdate
+    })
+
+
+    //listen to the output Update 
+    socket.on('outputUpdate' , ({roomId, output}) =>{
+        roomOutputStore[roomId] = output ; 
+        socket.to(roomId).emit('outputUpdate' , output) ;
+    });
     // Handle disconnects
     socket.on('disconnect', () => {
         console.log('A user disconnected');
