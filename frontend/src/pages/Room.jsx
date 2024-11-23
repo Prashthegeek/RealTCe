@@ -160,8 +160,7 @@
 // };
 
 // export default Room;
-
-import { Box, useToast, VStack, HStack, Button,  Select } from '@chakra-ui/react';
+import { Box, useToast, VStack, HStack, Button, Select } from '@chakra-ui/react';
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
@@ -287,64 +286,135 @@ const handleExecuteCode = async () => {
         socket.emit('outputUpdate' , {roomId, errorMessage}) ;
     }
 };
+
     return (
-        <Box display="flex" height="100vh" padding={4}>
-            <VStack width="20%" bg="gray.100" p={4} spacing={4}>
-                <Box>
-                    <strong>Room ID:</strong> {roomId}
-                    <Button onClick={() => navigator.clipboard.writeText(roomId)}>Copy Room ID</Button>
+        <Box display="flex" height="100vh" bg="gray.50">
+            {/* Sidebar */}
+            <VStack 
+                width="250px" 
+                bg="white" 
+                p={6} 
+                spacing={6}
+                borderRight="1px" 
+                borderColor="gray.200"
+                shadow="sm"
+            >
+                <Box width="full">
+                    <Box mb={2} fontWeight="bold" color="gray.700">Room ID</Box>
+                    <HStack spacing={2}>
+                        <Box 
+                            p={2} 
+                            bg="gray.100" 
+                            borderRadius="md" 
+                            fontSize="sm"
+                            flex="1"
+                        >
+                            {roomId}
+                        </Box>
+                        <Button 
+                            size="sm" 
+                            colorScheme="blue"
+                            onClick={() => navigator.clipboard.writeText(roomId)}
+                        >
+                            Copy
+                        </Button>
+                    </HStack>
                 </Box>
 
-                {/* Display list of users */}
-                <Box>
-                    <strong>Users in Room:</strong>
-                    <ul>
+                <Box width="full">
+                    <Box mb={2} fontWeight="bold" color="gray.700">Connected Users</Box>
+                    <VStack 
+                        align="stretch" 
+                        spacing={2}
+                        maxH="200px"
+                        overflowY="auto"
+                        width="full"
+                    >
                         {users.map((userName, index) => (
-                            <li key={index}>{userName}</li>
+                            <Box 
+                                key={index}
+                                p={2}
+                                bg="gray.50"
+                                borderRadius="md"
+                                fontSize="sm"
+                            >
+                                {userName}
+                            </Box>
                         ))}
-                    </ul>
+                    </VStack>
                 </Box>
             </VStack>
 
-            {/*for language selection */}
-
-            <Select
-                placeholder="Select Language"
-                value={language}  //current value selected is whatever there is stored inside language.
-                onChange={handleLangChange}
-                mb={4}
-            >
-                {languages.map((lang) => (
-                    <option key={lang.value} value={lang.value}>
-                        {lang.label}
-                    </option>
-                ))}
-            </Select>
-
-
-            <VStack flex="1" bg="white" p={4} spacing={4}>
-                <HStack justifyContent="space-between" width="full">
-                    <h2>Code Collaboration Area</h2>
-                    <Button onClick={handleExecuteCode} colorScheme="teal">Execute Code</Button>
+            {/* Main Content */}
+            <VStack flex="1" p={6} spacing={6} align="stretch">
+                <HStack spacing={4}>
+                    <Select
+                        value={language}
+                        onChange={handleLangChange}
+                        width="200px"
+                        bg="white"
+                        shadow="sm"
+                    >
+                        {languages.map((lang) => (
+                            <option key={lang.value} value={lang.value}>
+                                {lang.label}
+                            </option>
+                        ))}
+                    </Select>
+                    <Button 
+                        onClick={handleExecuteCode} 
+                        colorScheme="green"
+                        shadow="sm"
+                        px={8}
+                    >
+                        Run Code
+                    </Button>
                 </HStack>
 
-                <Box height="80%" width="100%" borderRadius="md">
+                {/* Editor */}
+                <Box 
+                    flex="1" 
+                    bg="white" 
+                    borderRadius="lg" 
+                    shadow="sm"
+                    overflow="hidden"
+                >
                     <MonacoEditor
                         height="100%"
-                        language="javascript" // Change to the desired language
+                        language={language}
                         value={code}
                         onChange={handleCodeChange}
                         options={{
                             automaticLayout: true,
+                            fontSize: 14,
+                            minimap: { enabled: false },
+                            scrollBeyondLastLine: false,
                         }}
                     />
                 </Box>
 
-                <Box width="100%" bg="gray.100" p={4} borderRadius="md">
-                    <strong>Output</strong>
-                    <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+                {/* Output */}
+                <Box
+                    bg="white"
+                    p={4}
+                    borderRadius="lg"
+                    shadow="sm"
+                    height="200px"
+                    overflowY="auto"
+                >
+                    <Box mb={2} fontWeight="bold" color="gray.700">Output</Box>
+                    <Box
+                        as="pre"
+                        p={3}
+                        bg="gray.50"
+                        borderRadius="md"
+                        fontSize="sm"
+                        fontFamily="mono"
+                        whiteSpace="pre-wrap"
+                        wordBreak="break-word"
+                    >
                         {typeof output === 'object' ? JSON.stringify(output, null, 2) : output}
-                    </pre>
+                    </Box>
                 </Box>
             </VStack>
         </Box>
