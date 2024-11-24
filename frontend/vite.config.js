@@ -24,7 +24,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000', // The target for API requests
+        target: 'https://rtct.onrender.com',        //'http://localhost:5000', // The target for API requests
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''), // Removes '/api' prefix from the request before forwarding
