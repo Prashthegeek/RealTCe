@@ -30,6 +30,8 @@ const executeCodeInDocker = async (code, language) => {
         // Get container info to check for early failures
         const containerInfo = await container.inspect();
         
+
+        
         // Wait for the container to finish execution
         const { StatusCode } = await container.wait();
         console.log('Container exited with status code:', StatusCode);
