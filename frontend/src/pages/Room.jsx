@@ -168,7 +168,8 @@ import { io } from 'socket.io-client';
 import MonacoEditor from '@monaco-editor/react'; // Import Monaco Editor
 import axios from 'axios';
 
-const socket = io('http://localhost:5000');
+const socket = io('https://rtct.onrender.com') //io('http://localhost:5000');
+
 
 
 const languages = [  //array of objects
@@ -264,7 +265,7 @@ const Room = () => {
 // Function to execute code
 const handleExecuteCode = async () => {
     try {
-        const response = await axios.post('http://localhost:5000/api/execute', { code, language });
+        const response = await axios.post('https://rtct.onrender.com/api/execute', { code, language });
 
         // Check if response contains output or error and update accordingly
         const output = response.data.output || response.data.error || 'No output generated';
