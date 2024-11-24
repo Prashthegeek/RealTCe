@@ -32,7 +32,7 @@ WORKDIR /app/frontend
 RUN npm install
 RUN npm run build
 
-# Go back to the root directory
+# Go back to the root directory  
 WORKDIR /app
 
 # Copy the script to start both services

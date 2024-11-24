@@ -6,4 +6,4 @@ npm start &
 
 # Serve the frontend build
 cd /app/frontend/build
-npx serve -s . -l 3000
+npx serve -s . -l 3000   
