@@ -20,7 +20,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const toast = useToast();
-  const baseURL = import.meta.env.VITE_Base_url;  //to use .env in frontend (in vite) , import.meta.env is used, backend me process.env used
+  const baseURL = import.meta.env.VITE_Base_url || "https://rtct.onrender.com";  //to use .env in frontend (in vite) , import.meta.env is used, backend me process.env used
 
   const handleChange = (e) => {
     const { name, value } = e.target;

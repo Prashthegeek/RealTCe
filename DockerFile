@@ -30,12 +30,14 @@ COPY ./frontend ./frontend
 # Install frontend dependencies and build the frontend
 WORKDIR /app/frontend
 RUN npm install
-RUN npm run build
+RUN npm run build RUN npm run build || { echo "Frontend build failed"; exit 1; }
+
 
 # Go back to the root directory  
 WORKDIR /app
 
-# Copy the script to start both services
+# Copy the script to start both services, in run-services.sh , we have written code dealing with build folder. 
+#so,run this part only if build folder is correctly build (so, gave a check while building the build folder,see above )
 COPY ./run-services.sh ./run-services.sh
 
 # Make the script executable

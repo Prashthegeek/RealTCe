@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const Login = () => {
-  const baseURL = import.meta.env.VITE_Base_url; // Use .env in frontend (Vite)
+  const baseURL = import.meta.env.VITE_Base_url  || "https://rtct.onrender.com" ; // Use .env in frontend (Vite)
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const toast = useToast();

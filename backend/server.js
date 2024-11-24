@@ -6,12 +6,15 @@ const cors = require('cors');
 const http = require('http'); 
 const { Server } = require('socket.io');
 require('dotenv').config();  
+const path = require('path');  // Ensure path is imported for serving static files in production
 
 const app = express();
 const server = http.createServer(app);
+
+// Update Socket.IO to allow frontend app to connect in production
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5173', // Allow frontend app to connect
+        origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Use environment variable for production URL
         methods: ['GET', 'POST'],
         credentials: true,
     },
@@ -20,12 +23,14 @@ const io = new Server(server, {
 // Connect to the database
 connectDB();
 
+
 // Middleware to enable CORS
 app.use(cors({
-    origin: 'http://localhost:5173', // Same origin as the frontend
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Same origin as the frontend
     methods: ['GET', 'POST'],
     credentials: true,
 }));
+
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -128,6 +133,22 @@ io.on('connection', (socket) => {  //listening to connection event (means user c
         }
     });
 });
+
+
+
+
+//-----------------production------------------------
+
+// Serve static files from the React frontend app
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// Anything that doesn't match the above, send back index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+});
+
+
+//----------------production ends --------------------------
 
 // Set the port for the server
 const PORT = process.env.PORT || 5000;
