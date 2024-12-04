@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import {
-  Box, Input, Button, InputGroup, InputRightElement, useToast, Heading, VStack, FormControl, FormLabel, Text, Link
+  Box, Input, Button, InputGroup, InputRightElement, useToast, Heading, VStack, FormControl, FormLabel, Text, Link,
+  Image,
+  Flex
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+
+import googleIcon from "../assets/google-icon.png"; //image of Google iconis  is in  the  assets folder 
+
 
 const Login = () => {
   const baseURL = import.meta.env.VITE_Base_url  || "https://rtct.onrender.com" ; // Use .env in frontend (Vite)
@@ -11,6 +16,14 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const toast = useToast();
   const navigate = useNavigate(); // Initialize useNavigate
+
+  
+  //for signup with google(oAuth)
+  const handleGoogleSignIn = () => {
+    // Redirect to the backend's Google OAuth endpoint
+    window.location.href = "http://localhost:5000/api/auth/google";
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -82,7 +95,7 @@ const Login = () => {
       >
         <Heading as="h2" size="lg" mb={6}>Welcome Back</Heading>
         <Text fontSize="md" mb={6}>Log in to your account to continue</Text>
-        <VStack spacing={4} as="form" onSubmit={handleSubmit}>
+        <VStack spacing={4} as="form">
           <FormControl id="email" isRequired>
             <FormLabel>Email</FormLabel>
             <Input
@@ -112,10 +125,46 @@ const Login = () => {
             </InputGroup>
           </FormControl>
 
-          <Button type="submit" colorScheme="blue" size="lg" width="full" mt={4}>
+          <Button type="button" colorScheme="blue" size="lg" width="full" mt={4} onClick={handleSubmit}>
             Log In
           </Button>
         </VStack>
+
+        {/*Google auth */}
+        
+          {/*Google auth */}
+          <Button
+              onClick={handleGoogleSignIn}
+              bg="white"
+              color="gray.700"
+              border="1px solid #ddd"
+              boxShadow="md"
+              borderRadius="full"
+              py={3}
+              px={5}
+              mt={5}
+              fontSize="lg"
+              fontWeight="medium"
+              transition="all 0.3s"
+              _hover={{
+                bg: "gray.100",
+                transform: "translateY(-2px)",
+                boxShadow: "lg",
+              }}
+              _active={{
+                bg: "gray.200",
+                transform: "scale(0.98)",
+                boxShadow: "sm",
+              }}
+              leftIcon={<Image src={googleIcon} boxSize="24px" />}
+            >
+              <Flex align="center">
+                <Text ml={2}>Sign in with Google</Text>
+              </Flex>
+            </Button>
+
+
+        {/*link to signup */}
         <Text mt={4}>
           Don't have an account?{' '}
           <Link color="teal.500" onClick={() => navigate('/signup')}>Sign up</Link>

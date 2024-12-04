@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
+  googleId: { type: String, unique: true },  //if joined using oAuth ,else this field wont exist in the db, jis jis doc me googleId hai, wo log login with google kiye hai.
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },

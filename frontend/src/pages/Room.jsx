@@ -161,6 +161,7 @@
 
 
 // export default Room;
+
 import { Box, useToast, VStack, HStack, Button, Select } from '@chakra-ui/react';
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
@@ -168,7 +169,8 @@ import { io } from 'socket.io-client';
 import MonacoEditor from '@monaco-editor/react'; // Import Monaco Editor
 import axios from 'axios';
 
-const socket = io('https://rtct.onrender.com') //io('http://localhost:5000');
+
+const socket = io('http://localhost:5000'); //io('https://rtct.onrender.com') //request for connection to server is sent for the first time from this line, this is the initiator of communication
 
 
 
@@ -190,6 +192,7 @@ const Room = () => {
     const hasWelcomed = useRef(false); // Ref to track if the welcome toast has been shown
     
 
+    
     // Welcome message effect
     useEffect(() => {
         if (user && !hasWelcomed.current) {
@@ -205,6 +208,8 @@ const Room = () => {
 
     // Room join and code handling effect (triggered only once on mount)
     useEffect(() => {
+
+
         socket.emit('joinRoom', { roomId, user });
 
         // const handleCodeUpdate = (currentCode) => {
@@ -246,6 +251,8 @@ const Room = () => {
             socket.off('outputUpdate');
 
             socket.off('userListUpdate');
+
+            socket.disconnect() ;  //to stop sending further requests to the server if component unmounts
         };
     }, []); // Empty dependency array to ensure this effect runs only once on mount
 
@@ -386,12 +393,16 @@ const handleExecuteCode = async () => {
                         language={language}
                         value={code}
                         onChange={handleCodeChange}
+                        theme='vs' // Set the dark theme
+                   
                         options={{
                             automaticLayout: true,
-                            fontSize: 14,
+                            fontSize: 21,
                             minimap: { enabled: false },
                             scrollBeyondLastLine: false,
+                            lineHeight: 24 // Adjusted line height for readability
                         }}
+
                     />
                 </Box>
 

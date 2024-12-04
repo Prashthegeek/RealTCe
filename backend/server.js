@@ -8,6 +8,15 @@ const { Server } = require('socket.io');
 require('dotenv').config();  
 const path = require('path');  // Ensure path is imported for serving static files in production
 
+//for oAuth
+const passportSetup = require('./config/passport-setup')   //even though isska koi use yaha nhi hai here,but, still it is necessary becoz 
+//for oAuth to work properly, so, when server.js runs ,then it requires passportSetup from passport-setup.js 
+//and which ultimately runs the googleStrategy inside the passport-setup.js
+const passport= require('passport');
+const session = require('express-session');  //better to use express-session than cookie session, just do changes in app.use(cookiesession)
+//part, baaki sab wahi rahega.
+
+
 const app = express();
 const server = http.createServer(app);
 
@@ -34,6 +43,22 @@ app.use(cors({
 
 // Middleware to parse JSON requests
 app.use(express.json());
+
+
+//for o Auth
+
+// Middleware for sessions
+app.use(session({
+    secret: 'aifuafjd', // Replace with a strong secret key
+    resave: false,      // Avoid saving session if it hasn't been modified
+    saveUninitialized: false, // Avoid saving empty sessions
+    cookie: {
+        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+        secure: process.env.NODE_ENV === 'production', // Set to true in production
+    },
+}));
+app.use(passport.initialize());
+app.use(passport.session()); 
 
 
 //execution routes 
@@ -139,13 +164,13 @@ io.on('connection', (socket) => {  //listening to connection event (means user c
 
 //-----------------production------------------------
 
-// Serve static files from the React frontend app
-app.use(express.static(path.join(__dirname, '../frontend/dist')));//npm run build in vite makes dist folder not the build 
+// // Serve static files from the React frontend app
+// app.use(express.static(path.join(__dirname, '../frontend/dist')));//npm run build in vite makes dist folder not the build 
 
-// Anything that doesn't match the above, send back index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));  //npm run build in vite makes dist folder not the build 
-});
+// // Anything that doesn't match the above, send back index.html
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));  //npm run build in vite makes dist folder not the build 
+// });
 
 
 //----------------production ends --------------------------
