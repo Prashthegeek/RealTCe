@@ -28,7 +28,7 @@ const transporter = nodemailer.createTransport({
       if (existingUser) {
         // If the user is verified, throw an error
         if (existingUser.isVerified) {
-          return res.status(400).json({ message: 'Account already exists' });  //since, status 400 se bheja hu, so , receiving end me catch block me jaayega and toast will be shown with the description of this message
+          return res.status(400).json({ message: 'Account already exists,Please Login' });  //since, status 400 se bheja hu, so , receiving end me catch block me jaayega and toast will be shown with the description of this message
         } else {
           // If the user is not verified, allow the signup process and resend OTP
           const otp = generateOtp();
@@ -48,7 +48,7 @@ const transporter = nodemailer.createTransport({
           return res.status(200).json({ message: 'User exists but is not verified. OTP has been resent.' });
         }
       }
-  
+      //if abhi tak return nhi hua hai,then user doesn't exist
       // If the user doesn't exist, proceed with creating a new one
       const user = await User.create({ name, email, password });
       const otp = generateOtp();
@@ -96,8 +96,9 @@ exports.resendOtp = async (req, res) => {
       if (!user) {
         return res.status(400).json({ message: 'User not found' });
       }
-  
+      //else
       const otp = generateOtp();
+      console.log(otp);
       user.otp = otp;
       await user.save();
   

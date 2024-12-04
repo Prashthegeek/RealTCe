@@ -23,7 +23,7 @@ const MainPage = () => {
     navigator.clipboard.writeText(newRoomId);
 
     // Navigate to the room page with the newly created room ID
-    navigate(`/room/${newRoomId}`);
+    navigate(`/room/${newRoomId}`);  //dynamic route , since, value part after / ,so need to handle it using Route path="/room/:roomId in routes part in app.jsx
   };
 
   const handleEnterRoom = () => {

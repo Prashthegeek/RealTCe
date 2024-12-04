@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import {Box, Input, Button, InputGroup, InputRightElement, useToast, Heading, VStack, FormControl, FormLabel} from '@chakra-ui/react';
+import {Box, Input, Button, InputGroup, InputRightElement, useToast, Heading, VStack, FormControl, FormLabel,Flex,Image} from '@chakra-ui/react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom' ;
 
 import { Link as RouterLink } from 'react-router-dom'; // RouterLink for navigation ,RouterLink from react-router-dom is used for routing.
 import { Link, Text } from '@chakra-ui/react'; // Chakra UI Link (for syling)
 
+
+import googleIcon from "../assets/google-icon.png"; //image of Google iconis  is in  the  assets folder 
+
 const Signup = () => {
-
-
   const navigate = useNavigate();  // Add this line at the beginning of your component
 
   const [formData, setFormData] = useState({
@@ -22,18 +23,26 @@ const Signup = () => {
   const toast = useToast();
   const baseURL = import.meta.env.VITE_Base_url || "https://rtct.onrender.com";  //to use .env in frontend (in vite) , import.meta.env is used, backend me process.env used
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+  //for signup with google(oAuth)
+  const handleGoogleSignIn = () => {
+    // Redirect to the backend's Google OAuth endpoint
+    window.location.href = "http://localhost:5000/api/auth/google";
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));  //name,password,email etc is part of object ,so using spread operator ensures all other fields are not changed and only the required field is getting updated
+  };
+
+
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { name, email, password, confirmPassword } = formData;
+    e.preventDefault();  //to stop default feature of form submission(like url attachment +  refreshing)
+    const { name, email, password, confirmPassword } = formData;  //destructuring
 
     // Check for empty fields
     if (!name || !email || !password || !confirmPassword) {
-      console.log("Empty field detected"); // Debugging line
       toast({
         title: 'All fields are required',
         status: 'warning',
@@ -107,7 +116,7 @@ const Signup = () => {
         <Text fontSize="md" mb={6}>
           Join us today to start collaborating!
         </Text>
-        <VStack spacing={4} as="form" onSubmit={handleSubmit}>
+        <VStack spacing={4} as="form">
           <FormControl id="name" isRequired>
             <FormLabel>Name</FormLabel>
             <Input
@@ -115,6 +124,7 @@ const Signup = () => {
               placeholder="Enter your name"
               value={formData.name}
               onChange={handleChange}
+              autoComplete="new-password" 
             />
           </FormControl>
 
@@ -126,6 +136,7 @@ const Signup = () => {
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
+              autoComplete="new-password" 
             />
           </FormControl>
 
@@ -138,6 +149,7 @@ const Signup = () => {
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete="new-password" 
               />
               <InputRightElement width="4.5rem">
                 <Button h="1.75rem" size="sm" onClick={() => setShowPassword(!showPassword)}>
@@ -152,10 +164,11 @@ const Signup = () => {
             <InputGroup size="md">
               <Input
                 name="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
+                type={showConfirmPassword ? "text" : "password"} //type refers to the view of the input 
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                autoComplete="new-password" 
               />
               <InputRightElement width="4.5rem">
                 <Button h="1.75rem" size="sm" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
@@ -165,10 +178,42 @@ const Signup = () => {
             </InputGroup>
           </FormControl>
 
-          <Button type="submit" colorScheme="blue" size="lg" width="full" mt={4}>
+          <Button type="button" colorScheme="blue" size="lg" width="full" mt={4} onClick={handleSubmit} > 
             Sign Up
           </Button>
 
+          {/*Google auth */}
+          <Button
+              onClick={handleGoogleSignIn}
+              bg="white"
+              color="gray.700"
+              border="1px solid #ddd"
+              boxShadow="md"
+              borderRadius="full"
+              py={3}
+              px={5}
+              fontSize="lg"
+              fontWeight="medium"
+              transition="all 0.3s"
+              _hover={{
+                bg: "gray.100",
+                transform: "translateY(-2px)",
+                boxShadow: "lg",
+              }}
+              _active={{
+                bg: "gray.200",
+                transform: "scale(0.98)",
+                boxShadow: "sm",
+              }}
+              leftIcon={<Image src={googleIcon} boxSize="24px" />}
+            >
+              <Flex align="center">
+                <Text ml={2}>Sign in with Google</Text>
+              </Flex>
+            </Button>
+
+
+            
            {/* Add login link below the signup button */}
            <Text mt={4}>
             Already have an account?{" "}

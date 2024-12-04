@@ -24,7 +24,7 @@ const OtpVerification = () => {
         isClosable: true,
       });
       // Redirect to the success page after verification
-      useNavigate('/successOtp');  // Navigate to success page  , endPoint-> /successOtp (not /verifyOtp/successOtp , since, navigate directly usi route ko target karta hai.)
+      navigate('/successOtp');  // Navigate to success page  , endPoint-> /successOtp (not /verifyOtp/successOtp , since, navigate directly usi route ko target karta hai.)
     } catch (error) {
       toast({
         title: 'OTP Verification failed',
@@ -54,8 +54,6 @@ const OtpVerification = () => {
         duration: 5000,
         isClosable: true,
       });
-    // Redirect to the failure page after failed verification
-    navigate('/failOtp');  // Navigate to failure page
     }
   };
 
