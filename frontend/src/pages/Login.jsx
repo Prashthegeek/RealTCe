@@ -21,7 +21,7 @@ const Login = () => {
   //for signup with google(oAuth)
   const handleGoogleSignIn = () => {
     // Redirect to the backend's Google OAuth endpoint
-    window.location.href = "http://localhost:5000/api/auth/google";
+    window.location.href = "https://rtct.onrender.com/api/auth/google";
   };
 
 
