@@ -49,6 +49,7 @@ const CreateRoom = ({ children }) => {
         } else {
             window.history.replaceState(null, "", `/room/${roomId}`);   //changed the current url and then at last render the children(so, in /room/${roomId} , 
           //we'll have Room.jsx(and no navigation ,so , api for /room:roomId wont be hit,just url of this page is changed and children is rendered (even after refresh url wont chnage)
+        }
       } catch(error) {
         toast({
           title: "Internal Server Error",
