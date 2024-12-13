@@ -61,12 +61,6 @@ app.use(passport.initialize());
 app.use(passport.session()); 
 
 
-//execution routes 
-app.use('/api/execute', ExecuteRoutes);
-// Authentication routes
-app.use('/api/auth', authRoutes);//isska bhi path authRoutes.js me define kar diya(glti se)
-
-
 // In-memory store for room codes and users
 const roomCodeStore = {};
 const roomLangStore = {} ;//store the current language of the room
@@ -74,6 +68,52 @@ const roomOutputStore = {};
 const roomUserStore = {}; // Object to keep track of users in each room
 
 
+//execution routes 
+app.use('/api/execute', ExecuteRoutes);
+// Authentication routes 
+app.use('/api/auth', authRoutes);//isska bhi path authRoutes.js me define kar diya(glti se)
+
+//check if room exists or not
+app.get('/api/checkRoom/:roomId', (req,res) =>{  //callback func // Use app.get() for GET requests
+    const roomId  = req.params.roomId; // Extract roomId from the URL//backend me url se aise params nikalte hai.
+    console.log("room id is ",roomId)
+
+    if (!roomId) {
+        return res.status(400).json({ status: false, message: 'Room ID is required' });
+    }
+
+    const roomExists = !!roomUserStore[roomId]; // Check if the room exists in the store(if user exists in that room ,then yeah room exists ,else not)
+
+    if (roomExists) {
+      return res.json({ status: true });
+    }
+    return res.json({ status: false });
+})
+
+// Endpoint to check if a room exists so,can we create a new one
+
+app.get('/api/create/:roomId', (req, res) => {
+    try {
+      const roomId = req.params.roomId; // Extract roomId from the URL
+      console.log('Room ID is:', roomId);
+  
+      if (!roomId) {
+        return res.status(400).json({ status: false, message: 'Room ID is required' });
+      }
+  
+      const roomExists = !!roomUserStore[roomId]; // Check if the room exists in the store
+  
+      if (roomExists) {
+        return res.json({ status: true }); // Room exists , so, in client side ,give the toast saying room already exist,so ,cant create this again
+      }
+  
+      return res.json({ status: false }); // Room does not exist
+    } catch (error) {
+      console.error('Error checking room:', error);
+      res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+  });
+  
 
 // Handle Socket.IO connections
 io.on('connection', (socket) => {  //listening to connection event (means user connected, now do the work)
@@ -157,7 +197,35 @@ io.on('connection', (socket) => {  //listening to connection event (means user c
             }
         }
     });
+
+
+    // leave room event handler
+socket.on('leaveRoom', ({ roomId, user }) => {
+    // Check if the room exists in roomUserStore
+    if (roomUserStore[roomId]) {
+        // Remove the user from the roomUserStore array
+        roomUserStore[roomId] = roomUserStore[roomId].filter(
+            userName => userName !== user.name
+        );
+
+        // Leave the socket room
+        socket.leave(roomId);
+
+        // Broadcast updated user list
+        io.to(roomId).emit('userListUpdate', roomUserStore[roomId]);
+
+        // If no users left in the room, optionally clean up room data
+        if (roomUserStore[roomId].length === 0) {
+            delete roomUserStore[roomId];
+        }
+
+        // notify other users that this user has left
+        socket.to(roomId).emit('userLeft', `${user.name} has left the room`);
+    }
 });
+
+});
+
 
 
 
