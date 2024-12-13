@@ -23,7 +23,7 @@ const server = http.createServer(app);
 // Update Socket.IO to allow frontend app to connect in production
 const io = new Server(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Use environment variable for production URL
+        origin: process.env.FRONTEND_URL || 'https://rtct.onrender.com', // Use environment variable for production URL
         methods: ['GET', 'POST'],
         credentials: true,
     },
@@ -35,7 +35,7 @@ connectDB();
 
 // Middleware to enable CORS
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Same origin as the frontend
+    origin: process.env.FRONTEND_URL || 'https://rtct.onrender.com', // Same origin as the frontend
     methods: ['GET', 'POST'],
     credentials: true,
 }));
@@ -54,7 +54,7 @@ app.use(session({
     saveUninitialized: false, // Avoid saving empty sessions
     cookie: {
         maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
-        secure: process.env.NODE_ENV === 'production', // Set to true in production
+        secure: process.env.NODE_ENV === 'docker' || 'production', // Set to true in docker or production
     },
 }));
 app.use(passport.initialize());
@@ -232,13 +232,13 @@ socket.on('leaveRoom', ({ roomId, user }) => {
 
 //-----------------production------------------------
 
-// // Serve static files from the React frontend app
-// app.use(express.static(path.join(__dirname, '../frontend/dist')));//npm run build in vite makes dist folder not the build 
+// Serve static files from the React frontend app
+app.use(express.static(path.join(__dirname, '../frontend/dist')));//npm run build in vite makes dist folder not the build 
 
-// // Anything that doesn't match the above, send back index.html
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));  //npm run build in vite makes dist folder not the build 
-// });
+// Anything that doesn't match the above, send back index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));  //npm run build in vite makes dist folder not the build 
+});
 
 
 //----------------production ends --------------------------
