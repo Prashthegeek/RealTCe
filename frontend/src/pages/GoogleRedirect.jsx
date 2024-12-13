@@ -21,6 +21,7 @@ const GoogleRedirection = () => {
       const user = { id, name, email };
       localStorage.setItem('user', JSON.stringify(user));
 
+
       // Set state to show loading message before redirect
       setIsRedirecting(true);
 
