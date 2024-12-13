@@ -27,7 +27,7 @@ const Signup = () => {
   //for signup with google(oAuth)
   const handleGoogleSignIn = () => {
     // Redirect to the backend's Google OAuth endpoint
-    window.location.href = "http://localhost:5000/api/auth/google";
+    window.location.href = "https://rtct.onrender.com/api/auth/google";
   };
 
   const handleChange = (e) => {
@@ -63,7 +63,7 @@ const Signup = () => {
     }
 
     try {
-      await axios.post(`${baseURL}/api/auth/signup`, { name, email, password });  //to use short url's without adding localhost:5000 at start, I did changes in vite.config.js
+      await axios.post(`${baseURL}/api/auth/signup`, { name, email, password });  
       //if status is good(200) , then this will execute , else catch block me go 
       toast({
         title: 'Signup successful!',
