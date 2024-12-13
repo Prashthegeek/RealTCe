@@ -9,17 +9,61 @@ import Room from './pages/Room.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 import GoogleRedirection from './pages/GoogleRedirect.jsx';
 import ProtectedRoute from './middleware/ProtectedRoute.jsx';
+import PublicRoute from './middleware/PublicRoute.jsx';
+import CheckRoom from './middleware/CheckRoom.jsx';
+import CreateRoom from './middleware/CreateRoom.jsx';
 
 function App() {
   return ( 
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+        {/* <Route path="/" element={<LandingPage />} /> */}
+        {/* <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} /> */}
         <Route path="/verifyOtp" element={<OtpVerification />} />
         <Route path="/successOtp" element={<SuccessOtp />} />
         <Route path="/failOtp" element={<FailOtp />} />
         <Route path="/google-redirect" element={<GoogleRedirection />} />  {/*for google redirect oAuth part */}
+
+
+        {/*creates a new room */}
+        
+        <Route
+          path="/room/create/:roomId"
+          element={
+            <CreateRoom>
+              <Room />
+            </CreateRoom>
+          }
+        />
+
+        {/*PublicRoute */}
+     
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <LandingPage />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          }
+        />
+
 
         {/* Protected Route */}
         <Route 
@@ -32,13 +76,13 @@ function App() {
         />
 
         
-        {/* Protected Route of Room*/}
+        {/* check Route of Room*/}
         <Route 
           path="/room/:roomId" 
           element={
-            <ProtectedRoute>
+            <CheckRoom>
               <Room />
-            </ProtectedRoute>
+            </CheckRoom>
           } 
         />
 
