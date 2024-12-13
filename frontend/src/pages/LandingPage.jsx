@@ -218,7 +218,7 @@ const LandingPage = () => {
         borderColor="whiteAlpha.300"
       >
         <Text fontSize="sm" color="whiteAlpha.600">
-          &copy; {new Date().getFullYear()} CodeSync. All rights reserved.
+          &copy; {new Date().getFullYear()} CodeTogether. All rights reserved.
         </Text>
       </Box>
     </Box>
