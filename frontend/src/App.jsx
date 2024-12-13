@@ -23,6 +23,7 @@ function App() {
         <Route path="/successOtp" element={<SuccessOtp />} />
         <Route path="/failOtp" element={<FailOtp />} />
         <Route path="/google-redirect" element={<GoogleRedirection />} />  {/*for google redirect oAuth part */}
+        <Route path="/" element={<LandingPage />} />
 
 
         {/*creates a new room */}
@@ -36,17 +37,8 @@ function App() {
           }
         />
 
-        {/*PublicRoute */}
-     
-        <Route
-          path="/"
-          element={
-            <PublicRoute>
-              <LandingPage />
-            </PublicRoute>
-          }
-        />
-
+        
+       {/*PublicRoute */}
         <Route
           path="/login"
           element={
