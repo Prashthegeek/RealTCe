@@ -54,7 +54,7 @@ app.use(session({
     saveUninitialized: false, // Avoid saving empty sessions
     cookie: {
         maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
-        secure: process.env.NODE_ENV === 'docker' || 'production', // Set to true in docker or production
+        secure: process.env.NODE_ENV === 'docker' || process.env.NODE_ENV === 'production', // Set to true in docker or production
     },
 }));
 app.use(passport.initialize());
