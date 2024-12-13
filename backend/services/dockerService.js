@@ -3,6 +3,7 @@ const docker = new Docker();
 const { languages } = require('../config/dockerConfig');
 
 const executeCodeInDocker = async (code, language) => {
+    console.log("inside docker part")
     const config = languages[language];
     if (!config) throw new Error('Language not supported');
 
@@ -10,13 +11,13 @@ const executeCodeInDocker = async (code, language) => {
     console.log('Executing code in Docker:', command);
 
     try {
-        // Create a container with specific options to capture error output
+        // Create a container with specific options to capture error and result
         const container = await docker.createContainer({
             Image: config.image,
             Cmd: ['sh', '-c', command],
             Tty: false,
-            AttachStdout: true,
-            AttachStderr: true,
+            AttachStdout: true,  //to get result
+            AttachStderr: true,  //to get error 
             // Add specific environment variables if needed
             Env: ['PYTHONUNBUFFERED=1'], // Example for Python
         });
@@ -70,9 +71,10 @@ const executeCodeInDocker = async (code, language) => {
             };
         } else {
             // Error in execution, return only the error
-            const errorMessage = formatErrorMessage(language, stderr, stdout);
+            // const errorMessage = formatErrorMessage(language, stderr, stdout);
+            // console.log(errorMessage)
             return {
-                error: errorMessage
+                error: stderr
             };
         }
         
@@ -86,33 +88,33 @@ const executeCodeInDocker = async (code, language) => {
     }
 };
 
-// Helper function to format error messages based on language
-const formatErrorMessage = (language, stderr, stdout) => {
-    switch (language.toLowerCase()) {
-        case 'python':
-            // Extract Python traceback
-            const pythonError = stderr.split('\n').filter(line => 
-                line.includes('Error:') || line.includes('Exception:')
-            ).join('\n');
-            return pythonError || stderr;
+// // Helper function to format error messages based on language
+// const formatErrorMessage = (language, stderr, stdout) => {
+//     switch (language.toLowerCase()) {
+//         case 'python':
+//             // Extract Python traceback
+//             const pythonError = stderr.split('\n').filter(line => 
+//                 line.includes('Error:') || line.includes('Exception:')
+//             ).join('\n');
+//             return pythonError || stderr;
 
-        case 'javascript':
-        case 'node':
-            // Format Node.js errors
-            const nodeError = stderr.match(/(?:Error:|^)[^\n]*/);
-            return nodeError ? nodeError[0] : stderr;
+//         case 'javascript':
+//         case 'node':
+//             // Format Node.js errors
+//             const nodeError = stderr.match(/(?:Error:|^)[^\n]*/);
+//             return nodeError ? nodeError[0] : stderr;
 
-        case 'java':
-            // Extract Java compilation/runtime errors
-            const javaError = stderr.split('\n').filter(line =>
-                line.includes('error:') || line.includes('Exception')
-            ).join('\n');
-            return javaError || stderr;
+//         case 'java':
+//             // Extract Java compilation/runtime errors
+//             const javaError = stderr.split('\n').filter(line =>
+//                 line.includes('error:') || line.includes('Exception')
+//             ).join('\n');
+//             return javaError || stderr;
 
-        default:
-            // Default error handling
-            return stderr || 'Unknown error occurred';
-    }
-};
+//         default:
+//             // Default error handling
+//             return stderr || 'Unknown error occurred';
+//     }
+// };
 
 module.exports = { executeCodeInDocker };
