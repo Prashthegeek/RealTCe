@@ -162,15 +162,17 @@
 
 // export default Room;
 
-import { Box, useToast, VStack, HStack, Button, Select } from '@chakra-ui/react';
+import { Box, useToast, VStack, HStack, Button, Select,Icon } from '@chakra-ui/react';
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import MonacoEditor from '@monaco-editor/react'; // Import Monaco Editor
 import axios from 'axios';
+import { LogOut } from 'lucide-react';  //used in leave room icon
 
 
-const socket = io('http://localhost:5000'); //io('https://rtct.onrender.com') //request for connection to server is sent for the first time from this line, this is the initiator of communication
+
+let socket; // Declare socket variable outside the useEffect(donot initialize socket connection here with io(url to backend) else even when Room.jsx component is unmounted , still socket connection will send request to backend, so,always intitialize the socket connection inside the useEffect with [] empty array dependency.)
 
 
 
@@ -185,13 +187,14 @@ const Room = () => {
     const { roomId } = useParams();
     const toast = useToast();
     const user = JSON.parse(localStorage.getItem('user')); // Retrieve user info
+    const token = localStorage.getItem('token'); // Retrieve token (no need for JSON.parse)
     const [code, setCode] = useState(''); // State for storing code
     const [users, setUsers] = useState([]); // State for tracking users in the room
     const [output, setOutput] = useState(''); // State for storing output
     const [language, setLanguage] = useState(languages[1].value)  //by default with js
     const hasWelcomed = useRef(false); // Ref to track if the welcome toast has been shown
     
-
+    const navigate = useNavigate(); // Add navigation hook
     
     // Welcome message effect
     useEffect(() => {
@@ -209,6 +212,7 @@ const Room = () => {
     // Room join and code handling effect (triggered only once on mount)
     useEffect(() => {
 
+        socket = io('http://localhost:5000'); //io('https://rtct.onrender.com') //request for connection to server is sent for the first time from this line, this is the initiator of communication
 
         socket.emit('joinRoom', { roomId, user });
 
@@ -225,8 +229,12 @@ const Room = () => {
         socket.on('codeUpdate', (xyz) => setCode(xyz));  
 
         //langugage part updation(first time user connect + when language updated)
-        socket.on('prevLang' , (xyz)  => setLanguage(xyz)) ;
-        socket.on('langUpdate' , (xyz) => setLanguage(xyz));
+        socket.on('prevLang', (xyz) => {
+            // Ensure the language is valid or set it to 'javascript' if not
+            setLanguage(xyz || languages[1].value); // Default to 'javascript' if no lang is received from server
+        });
+    
+        socket.on('langUpdate' , (xyz) => setLanguage(xyz)) ;
 
         //output part (1.first time user joined    2. when output changed)
         socket.on('prevOutput' , (xyz)=> setOutput(xyz));
@@ -235,7 +243,15 @@ const Room = () => {
 
         socket.on('userListUpdate', (userList) => setUsers(userList));
 
-        
+        socket.on('userLeft', (message) => {
+            toast({
+                title: `${message}`,
+                bgColor: 'purple.500', // Use Chakra's color tokens
+                color: 'white', // Ensure text is readable
+                duration: 3000,
+                isClosable: true
+            });
+        })
 
         return () => {
             // Clean up the listeners
@@ -252,39 +268,47 @@ const Room = () => {
 
             socket.off('userListUpdate');
 
-            socket.disconnect() ;  //to stop sending further requests to the server if component unmounts
+            socket.off('userLeft');
+
+            socket.disconnect() ;  //to stop sending further requests (emit parts ) to the server if component unmounts
         };
     }, []); // Empty dependency array to ensure this effect runs only once on mount
 
     // Handle code input change
     const handleCodeChange = (value) => {
-        setCode(value);
-        socket.emit('codeUpdate', { roomId, code: value });
+        setCode((prevCode) => {
+            const updatedCode = value;
+            socket.emit('codeUpdate', { roomId, code: updatedCode });
+            return updatedCode;
+        });
     };
+    
 
     //handle language change
-    const handleLangChange = (e) =>{
-        const newLanguage = e.target.value; // Get the selected language
-        setLanguage(newLanguage); // Update state
-        socket.emit('langUpdate', { roomId, language: newLanguage }); // Emit the updated language
+    const handleLangChange = (e) => {      
+        const value = e.target.value; // Correct way to get value from Select
+        setLanguage(value); // Update state
+        socket.emit('langUpdate', { roomId, language: value }); // Emit the updated language
     }
-
 // Function to execute code
 const handleExecuteCode = async () => {
     try {
-        const response = await axios.post('https://rtct.onrender.com/api/execute', { code, language });
+        console.log("language selected is ", language);
+        console.log("Languages array:", languages);
 
-        // Check if response contains output or error and update accordingly
-        const output = response.data.output || response.data.error || 'No output generated';
+        const response = await axios.post('http://localhost:5000/api/execute', { code, language ,user}) //user to check authorization
 
-        // Update the output in the UI
-        setOutput(output);
+        // console.log("the output is",response)    //response is an object has data object inside which contians output field
+
+        const answer = response.data.output;  //this output stores both the output(code code written) and error(incorrect code written) 
+        setOutput(answer);
 
         //send the output to the server(server me iss room ke liye output store)
-        socket.emit('outputUpdate' , {roomId, output}) ;
+        socket.emit('outputUpdate' , {roomId, output:answer}) ;  
     } catch (error) {
+
         // Handle any network or server errors
-        const errorMessage = error.response?.data?.error || 'Code execution failed';
+        const errorMessage = error.message || 'Code execution failed';
         
         console.error('Error executing code:', errorMessage);
         
@@ -293,6 +317,36 @@ const handleExecuteCode = async () => {
 
         //send the erroMessage to the server(server me iss room ke liye output store)
         socket.emit('outputUpdate' , {roomId, errorMessage}) ;
+    }
+};
+
+//leave the room
+const handleLeaveRoom = () => {
+    try {
+        // Emit leave room event to server
+        socket.emit('leaveRoom', { roomId, user });
+
+        // Show a toast notification
+        toast({
+            title: "Room Left",
+            description: `You have left the room ${roomId}`,
+            status: "info",
+            duration: 3000,
+            isClosable: true
+        });
+
+        // Navigate back to the main page
+        navigate('/main');
+    } catch (error) {
+        // Handle any potential errors
+        toast({
+            title: "Error",
+            description: "Failed to leave the room",
+            status: "error",
+            duration: 3000,
+            isClosable: true
+        });
+        console.error('Error leaving room:', error);
     }
 };
 
@@ -426,7 +480,25 @@ const handleExecuteCode = async () => {
                         whiteSpace="pre-wrap"
                         wordBreak="break-word"
                     >
-                        {typeof output === 'object' ? JSON.stringify(output, null, 2) : output}
+                         {typeof output === 'object' ? JSON.stringify(output, null, 2) : output}
+                    </Box>
+
+
+                    {/* Leave Room Button - Bottom Left */}
+                    <Box 
+                        position="absolute" 
+                        bottom={4} 
+                        left={4}
+                        zIndex={10}
+                    >
+                        <Button 
+                            colorScheme="red" 
+                            variant="outline"
+                            leftIcon={<Icon as={LogOut} />}
+                            onClick={handleLeaveRoom}
+                        >
+                            Leave Room
+                        </Button>
                     </Box>
                 </Box>
             </VStack>
