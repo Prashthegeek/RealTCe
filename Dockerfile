@@ -36,6 +36,9 @@ COPY ./frontend ./frontend
 WORKDIR /app/frontend
 RUN npm install --omit=dev
 
+# Ensure `vite` is installed (either globally or locally)
+RUN npm install vite --save-dev
+
 # Build the frontend
 RUN npm run build || { echo "❌ Frontend build failed. Exiting deployment."; exit 1; }
 
