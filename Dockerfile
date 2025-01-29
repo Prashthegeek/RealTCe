@@ -1,7 +1,7 @@
 # Base image
 FROM ubuntu:22.04
 
-# Update and install dependencies in a single RUN step
+# Install dependencies & Docker Engine (not just CLI)
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
@@ -12,13 +12,8 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     gnupg \
     lsb-release \
+    docker.io \
     && apt-get clean
-
-# Install Docker CLI
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
-    apt-get update && \
-    apt-get install -y docker-ce-cli
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
@@ -59,5 +54,5 @@ RUN mkdir -p /var/run && touch /var/run/docker.sock && chmod 777 /var/run/docker
 # Expose ports (5000 for backend, 3000 for frontend)
 EXPOSE 3000 5000
 
-# Start the application (ensure script exists before running)
+# Start the application
 CMD ["bash", "-c", "[ -f ./run-services.sh ] && ./run-services.sh || echo '❌ run-services.sh not found. Exiting.'"]
