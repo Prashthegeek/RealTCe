@@ -23,7 +23,7 @@ const server = http.createServer(app);
 // Update Socket.IO to allow frontend app to connect in production
 const io = new Server(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || 'https://rtct.onrender.com', // Use environment variable for production URL
+        origin: process.env.FRONTEND_URL || 'http://13.61.241.125:3000', // Use environment variable for production URL
         methods: ['GET', 'POST'],
         credentials: true,
     },
@@ -35,7 +35,7 @@ connectDB();
 
 // Middleware to enable CORS
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'https://rtct.onrender.com', // Same origin as the frontend
+    origin: process.env.FRONTEND_URL || 'http://13.61.241.125:3000', // Same origin as the frontend
     methods: ['GET', 'POST'],
     credentials: true,
 }));

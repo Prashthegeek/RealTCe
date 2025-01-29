@@ -36,7 +36,7 @@ const CreateRoom = ({ children }) => {
       }
 
       try {
-        const { data } = await axios.get(`https://rtct.onrender.com/api/create/${roomId}`);
+        const { data } = await axios.get(`http://13.61.241.125:5000/api/create/${roomId}`);
 
         if (data.status) {
           toast({
