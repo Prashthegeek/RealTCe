@@ -1,7 +1,7 @@
 # Base image
 FROM ubuntu:22.04
 
-# Update and install dependencies
+# Update and install dependencies in a single RUN step
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
@@ -31,7 +31,7 @@ COPY ./backend ./backend
 
 # Install backend dependencies
 WORKDIR /app/backend
-RUN npm install
+RUN npm install --omit=dev
 
 # Copy frontend files
 WORKDIR /app
@@ -39,10 +39,10 @@ COPY ./frontend ./frontend
 
 # Install frontend dependencies
 WORKDIR /app/frontend
-RUN npm install
+RUN npm install --omit=dev
 
 # Build the frontend
-RUN npm run build || { echo "Frontend build failed"; exit 1; }
+RUN npm run build || { echo "❌ Frontend build failed. Exiting deployment."; exit 1; }
 
 # Go back to the root directory
 WORKDIR /app
@@ -53,19 +53,11 @@ COPY ./run-services.sh ./run-services.sh
 # Make the script executable
 RUN chmod +x ./run-services.sh
 
-# Create .dockerenv file to detect Docker environment
-RUN touch /.dockerenv
-
-# Give permissions to Docker socket
-RUN mkdir -p /var/run && touch /var/run/docker.sock && chmod 666 /var/run/docker.sock
+# Ensure Docker socket permissions (avoid permission issues)
+RUN mkdir -p /var/run && touch /var/run/docker.sock && chmod 777 /var/run/docker.sock
 
 # Expose ports (5000 for backend, 3000 for frontend)
 EXPOSE 3000 5000
 
-
-# we have written code dealing with build folder. 
-# #so,run this part only if build folder is correctly build (so, gave a check while building the build folder,see above ),if not build then exit maar do, dont run more codes, deployment will stop
-# Start the application
-# Start the application
-CMD ["./run-services.sh"]
-
+# Start the application (ensure script exists before running)
+CMD ["bash", "-c", "[ -f ./run-services.sh ] && ./run-services.sh || echo '❌ run-services.sh not found. Exiting.'"]
