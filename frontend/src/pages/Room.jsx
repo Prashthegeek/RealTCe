@@ -47,7 +47,7 @@ const Room = () => {
     // Room join and code handling effect (triggered only once on mount)
     useEffect(() => {
 
-        socket = io('http://13.61.241.125:5000'); 
+        socket = io('https://rtct.onrender.com'); 
 
         socket.emit('joinRoom', { roomId, user });
 
@@ -123,7 +123,7 @@ const handleExecuteCode = async () => {
         console.log("language selected is ", language);
         console.log("Languages array:", languages);
 
-        const response = await axios.post('http://13.61.241.125:5000/api/execute', { code, language ,user}) //user to check authorization
+        const response = await axios.post('https://rtct.onrender.com/api/execute', { code, language ,user}) //user to check authorization
 
         // console.log("the output is",response)    //response is an object has data object inside which contians output field
 
