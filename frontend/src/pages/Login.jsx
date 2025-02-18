@@ -11,7 +11,7 @@ import googleIcon from "../assets/google-icon.png"; //image of Google iconis  is
 
 
 const Login = () => {
-  const baseURL = import.meta.env.VITE_Base_url  || "http://13.61.241.125:5000" ; // Use .env in frontend (Vite)
+  const baseURL = import.meta.env.VITE_Base_url  || "http://localhost:5000" ; // Use .env in frontend (Vite)
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const toast = useToast();
@@ -21,7 +21,7 @@ const Login = () => {
   //for signup with google(oAuth)
   const handleGoogleSignIn = () => {
     // Redirect to the backend's Google OAuth endpoint
-    window.location.href = "http://13.61.241.125:5000/api/auth/google";
+    window.location.href = "http://localhost:5000/api/auth/google";
   };
 
 
