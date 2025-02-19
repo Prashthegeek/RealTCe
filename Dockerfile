@@ -66,7 +66,7 @@
 # Base image
 FROM ubuntu:22.04
 
-# Install dependencies and only the Docker client (not the full docker.io)
+# Install dependencies and only the Docker client (not the full docker.io) (including software-properties-common)
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
@@ -77,6 +77,7 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     gnupg \
     lsb-release \
+    software-properties-common \
     && apt-get clean
 
 # Install Docker client (docker-ce-cli) from Docker's repository
