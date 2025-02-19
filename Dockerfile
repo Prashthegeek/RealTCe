@@ -111,7 +111,7 @@
 # Base image
 FROM ubuntu:22.04
 
-# Install dependencies and only the Docker client (not the full docker.io)
+# Install dependencies (including software-properties-common) but NOT the Docker daemon.
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
@@ -122,14 +122,12 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     gnupg \
     lsb-release \
+    software-properties-common \
     && apt-get clean
 
 # Install Docker client (docker-ce-cli) from Docker's repository
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
-    add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable" && \
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" && \
     apt-get update && \
     apt-get install -y docker-ce-cli
 
@@ -154,7 +152,7 @@ COPY ./frontend ./frontend
 WORKDIR /app/frontend
 RUN npm install --omit=dev
 
-# Ensure Vite is installed (either globally or locally)
+# Ensure vite is installed
 RUN npm install vite --save-dev
 
 # Build the frontend
@@ -169,8 +167,7 @@ COPY ./run-services.sh ./run-services.sh
 # Make the script executable
 RUN chmod +x ./run-services.sh
 
-# (Optional) Create the Docker socket file with proper permissions.
-# This step is often unnecessary if you're mounting the host's socket.
+# (Optional) Ensure Docker socket permissions (though you’ll be mounting it)
 RUN mkdir -p /var/run && touch /var/run/docker.sock && chmod 777 /var/run/docker.sock
 
 # Expose ports (5000 for backend, 3000 for frontend)
@@ -178,8 +175,6 @@ EXPOSE 3000 5000
 
 # Start the application
 CMD ["bash", "-c", "[ -f ./run-services.sh ] && ./run-services.sh || echo '❌ run-services.sh not found. Exiting.'"]
-
-
 
 # We’ve removed the installation of docker.io (which installs the Docker daemon) and instead install the Docker client (docker-ce-cli) so that your container can issue Docker commands.
 # The rest of the Dockerfile builds both backend and frontend as before.
