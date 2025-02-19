@@ -33,7 +33,7 @@ const CheckRoom = ({ children }) => {
 
     const verifyRoom = async () => {
       try {
-        const { data } = await axios.get(`http://13.61.241.125:5000/api/checkRoom/${roomId}`);
+        const { data } = await axios.get(`http://51.20.117.228:5000/api/checkRoom/${roomId}`);
         setIsValid(data.status);
 
         if (!data.status) {
