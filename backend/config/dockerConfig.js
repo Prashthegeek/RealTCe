@@ -1,11 +1,11 @@
 module.exports = {
     languages: {
         python: { 
-            image: 'python:3.9', 
+            image: 'python:3.9-slim', 
             command: (code) => `python -c "${code.replace(/"/g, '\\"')}"` 
         },
         javascript: { 
-            image: 'node:14', 
+            image: 'node:14-slim', 
             command: (code) => `node -e "${code.replace(/"/g, '\\"')}"` 
         },
         cpp: {
@@ -21,7 +21,7 @@ module.exports = {
             }
         },
         java: { 
-            image: 'openjdk:11', 
+            image: 'openjdk:11-slim', 
             command: (code) => `bash -c "echo '${code.replace(/'/g, "'\\''")
                 .replace(/"/g, '\\"')}' > /tmp/Main.java && javac /tmp/Main.java && java -cp /tmp Main"` 
         },

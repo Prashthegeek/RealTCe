@@ -23,7 +23,7 @@ passport.deserializeUser(async (id, done) => {
 passport.use(
     new GoogleStrategy({
         //optionas for google strategy
-        callbackURL:'https://rtct.onrender.com/api/auth/google/redirect',  //Root url already mentioned in google developers console, for deployemnt , we need to give full callback address ,relative one wont work
+        callbackURL:`${process.env.BACKEND_URL}/api/auth/google/redirect`,  //Root url already mentioned in google developers console, for deployemnt , we need to give full callback address ,relative one wont work
         clientID:process.env.GOOGLE_CLIENT_ID,
         clientSecret:process.env.GOOGLE_CLIENT_SECRET
         

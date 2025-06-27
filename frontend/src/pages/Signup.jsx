@@ -21,13 +21,13 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const toast = useToast();
-  const baseURL = import.meta.env.VITE_Base_url || "http://51.20.117.228:5000";  //to use .env in frontend (in vite) , import.meta.env is used, backend me process.env used
+  const baseURL = import.meta.env.VITE_BACKEND_URI || "http://51.20.117.228:5000";  //to use .env in frontend (in vite) , import.meta.env is used, backend me process.env used
 
 
   //for signup with google(oAuth)
   const handleGoogleSignIn = () => {
     // Redirect to the backend's Google OAuth endpoint
-    window.location.href = "http://51.20.117.228:5000/api/auth/google";
+    window.location.href = `${import.meta.env.VITE_BACKEND_URI}/api/auth/google`;
   };
 
   const handleChange = (e) => {

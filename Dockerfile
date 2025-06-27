@@ -64,6 +64,7 @@
 
 
 # Base image
+
 FROM ubuntu:22.04
 
 # Install dependencies and only the Docker client (not the full docker.io) (including software-properties-common)

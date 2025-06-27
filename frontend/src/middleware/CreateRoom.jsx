@@ -36,7 +36,7 @@ const CreateRoom = ({ children }) => {
       }
 
       try {
-        const { data } = await axios.get(`http://51.20.117.228:5000/api/create/${roomId}`);
+        const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URI}/api/create/${roomId}`);
 
         if (data.status) {
           toast({
