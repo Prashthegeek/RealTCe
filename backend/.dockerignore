@@ -1,0 +1,7 @@
+node_modules
+*.log
+
+
+
+#we are also writing run-services.sh because ,in Dockerfile ,we are explicitely copying run-services.sh file before COPY . . command (so, that layer caching ka fayda utha sake )
+#and we don't want COPY . .  command to again copy the run-service.sh file and Dockerfile again from the root of backend folder (so, place them inside the docker ignore file ) ,so that when copy . . command runs ,these files are ignored from the root of backend ,else they would also get copied agian (which we don't want )
