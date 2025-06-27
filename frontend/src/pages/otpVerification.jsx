@@ -10,7 +10,7 @@ const OtpVerification = () => {
   const location = useLocation();
   const email = location.state?.email;  // Access email from route state , sent as a state using navigate , this email can be used in both handleOtpSubmit and resendotp function
 
-  const baseURL = import.meta.env.VITE_Base_url || "http://51.20.117.228:5000";  //contains backend ka url , in vite , .env is used with import.meta.env
+  const baseURL = import.meta.env.VITE_BACKEND_URI || "http://51.20.117.228:5000";  //contains backend ka url , in vite , .env is used with import.meta.env
   const navigate = useNavigate() ; //created an instance of useNavigate with name navigate.
 
   const handleOtpSubmit = async () => {

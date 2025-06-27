@@ -230,18 +230,22 @@ socket.on('leaveRoom', ({ roomId, user }) => {
 
 
 
-//-----------------production------------------------
+//-----------------only for production(not for development)------------------------
+//only for production(not for development) , if in development mode, no need to include this as -> in developement frotend talks directly with backend using proxy 
+// in production , it is only needed when -> both frontend and backend deployed ek saath (ie, whole application deployed ->whole project deployed )
+// if frontend and backend deployed seperately on 2 different platforms, like -> frontend in vercel and backend in aws (no need of this)because backend doesn’t need to serve any HTML.
 
-// Serve static files from the React frontend app
-app.use(express.static(path.join(__dirname, '../frontend/dist')));//npm run build in vite makes dist folder not the build 
+if (process.env.Environment === 'production' && process.env.Platform==='same') {
+    // Serve static files from the React frontend app
+    app.use(express.static(path.join(__dirname, '../frontend/dist')));//npm run build in vite makes dist folder not the build 
 
-// Anything that doesn't match the above, send back index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));  //npm run build in vite makes dist folder not the build 
-});
+    // Anything that doesn't match the above, send back index.html
+    app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));  //npm run build in vite makes dist folder not the build 
+    });
+}
 
-
-//----------------production ends --------------------------
+//---------------- end --------------------------
 
 // Set the port for the server
 const PORT = process.env.PORT || 5000;

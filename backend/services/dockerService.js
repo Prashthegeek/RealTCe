@@ -1,5 +1,5 @@
 const Docker = require('dockerode');
-const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+const docker = new Docker({ socketPath: '/var/run/docker.sock' });//in dev mode , docker daemon must be on the machine ,so, used pipe , if linux /production me hota,then -> /var/run/docker.sock should be used for socket path.
 const { languages } = require('../config/dockerConfig');
 
 const executeCodeInDocker = async (code, language) => {
@@ -19,12 +19,12 @@ const executeCodeInDocker = async (code, language) => {
             AttachStdout: true,
             AttachStderr: true,
             HostConfig: {
-                Memory: 100 * 1024 * 1024,  // 100MB memory limit
-                MemorySwap: 100 * 1024 * 1024,  // Disable swap
+                Memory: 1024 * 1024 * 1024,        // 1GB memory limit
+                MemorySwap: 1024 * 1024 * 1024, // Also 1GB
                 CpuPeriod: 100000,
                 CpuQuota: 50000,  // Limit to 50% CPU
                 NetworkMode: 'none',  // Disable network access
-                AutoRemove: true,  // Automatically remove container after execution
+                AutoRemove: false ,  // Automatically remove container after execution
                 PidsLimit: 50,  // Limit number of processes
                 SecurityOpt: ['no-new-privileges']  // Prevent privilege escalation
             }

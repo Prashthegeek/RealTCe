@@ -47,7 +47,8 @@ const Room = () => {
     // Room join and code handling effect (triggered only once on mount)
     useEffect(() => {
 
-        socket = io('http://51.20.117.228:5000'); 
+        socket = io(import.meta.env.VITE_BACKEND_URI);
+
 
         socket.emit('joinRoom', { roomId, user });
 
@@ -123,7 +124,7 @@ const handleExecuteCode = async () => {
         console.log("language selected is ", language);
         console.log("Languages array:", languages);
 
-        const response = await axios.post('http://51.20.117.228:5000/api/execute', { code, language ,user}) //user to check authorization
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URI}/api/execute`, { code, language ,user}) //user to check authorization
 
         // console.log("the output is",response)    //response is an object has data object inside which contians output field
 
