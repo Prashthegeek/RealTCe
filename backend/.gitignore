@@ -43,6 +43,9 @@ uploads/
 pm2.log
 pm2.pid
 
+# Docker
+.dockerignore
+Dockerfile*
 
 # Generated files
 package-lock.json
