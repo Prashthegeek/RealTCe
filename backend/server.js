@@ -49,9 +49,9 @@ app.use(express.json());
 
 // Middleware for sessions
 app.use(session({
-    secret: 'aifuafjd', // Replace with a strong secret key
-    resave: false,      // Avoid saving session if it hasn't been modified
-    saveUninitialized: false, // Avoid saving empty sessions
+    secret: process.env.Session_Secret_key, //  a strong secret key
+    resave: false,      //it avoids saving session if it hasn't been modified
+    saveUninitialized: false, // so, it avoids saving empty sessions
     cookie: {
         maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
         secure: process.env.NODE_ENV === 'docker' || process.env.NODE_ENV === 'production', // Set to true in docker or production
